@@ -8,6 +8,8 @@ public class ForBlogController {
 
     @GetMapping(value = "/")
     String hello(){
-        return "Hello World!";
+        TestLombok testLombok = new TestLombok();
+        testLombok.setStr("Hello World!");
+        return testLombok.getStr();
     }
 }
