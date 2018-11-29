@@ -13,12 +13,11 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static com.sun.org.apache.xerces.internal.util.PropertyState.is;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -29,9 +28,12 @@ public class AccountControllerTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
+    @Autowired
+    AccountService accountService;
+
     private MockMvc mockMvc;
 
-    private Account registerAccountDto;
+    private AccountDto.AccountRegister registerAccountDto;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -42,7 +44,11 @@ public class AccountControllerTest {
                 .apply(springSecurity())
                 .build();
 
-        registerAccountDto = new Account("hsoh", "password", "hsoh@gmail.com");
+        registerAccountDto = AccountDto.AccountRegister.builder()
+                .name("hsoh")
+                .password("password")
+                .email("hsoh@gmail.com")
+                .build();
     }
 
     /**
@@ -89,24 +95,22 @@ public class AccountControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-//    @Test
-//    public void getAllAccount() throws Exception {
-//        /**
-//         * 계정 리스트를 조회한다.
-//         * 성공적으로 조회하면 200 상태코드를 반환한다.
-//         */
-//        // Given
-//        accountRepository.save(this.registerAccountDto);
-//        accountRepository.save(new Account("wellstone", "password", "wellstone@gmail.com"));
-//
-//        // When
-//        final ResultActions resultActions = mockMvc.perform(get("/accounts"));
-//
-//        // Then
-//        resultActions.andDo(print())
-//                .andExpect(status().isOk());
-//
-//    }
+    /**
+     * 계정 리스트를 조회한다.
+     * 성공적으로 조회하면 200 상태코드를 반환한다.
+     */
+    @Test
+    public void getAllAccount() throws Exception {
+        // Given
+        accountService.register(this.registerAccountDto);
+
+        // When
+        final ResultActions resultActions = mockMvc.perform(get("/accounts"));
+
+        // Then
+        resultActions.andDo(print())
+                .andExpect(status().isOk());
+    }
 
 
 }
