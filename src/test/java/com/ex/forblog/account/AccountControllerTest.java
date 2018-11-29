@@ -45,12 +45,18 @@ public class AccountControllerTest {
                 .apply(springSecurity())
                 .build();
 
-        registerAccountDto = new Account("ohs", "password", "ohs@gmail.com");
+        registerAccountDto = new Account("hsoh", "password", "hsoh@gmail.com");
     }
 
 
     @Test
     public void registAccount() throws Exception {
+        /**
+         * 계정을 등록한다
+         * id:1, name:hsoh, password:password, email:hsoh@gmail.com
+         * 성공적으로 등록되면 201 상태코드를 반환한다.
+         * 성공적으로 등록되면 등록한 계정정보가 반환된다.
+         */
         // Given
 
         // When
@@ -62,16 +68,20 @@ public class AccountControllerTest {
         // Then
         resultActions.andDo(print())
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("id").value(2))
-                .andExpect(jsonPath("name").value("ohs"))
+                .andExpect(jsonPath("name").value("hsoh"))
                 .andExpect(jsonPath("password").value("password"))
-                .andExpect(jsonPath("email").value("ohs@gmail.com"));
-
+                .andExpect(jsonPath("email").value("hsoh@gmail.com"));
     }
 
     @Test
     public void getAllAccount() throws Exception {
+        /**
+         * 계정 리스트를 조회한다.
+         * 성공적으로 조회하면 200 상태코드를 반환한다.
+         */
         // Given
+        accountRepository.save(this.registerAccountDto);
+        accountRepository.save(new Account("wellstone", "password", "wellstone@gmail.com"));
 
         // When
         final ResultActions resultActions = mockMvc.perform(get("/accounts"));
@@ -81,4 +91,6 @@ public class AccountControllerTest {
                 .andExpect(status().isOk());
 
     }
+
+
 }

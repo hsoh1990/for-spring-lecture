@@ -11,15 +11,12 @@ import java.util.List;
 @Repository
 public class AccountRepository {
 
-    private List<Account> accounts = new ArrayList();
+    private List<Account> accounts = new ArrayList<Account>();
     private int accountId;
 
 
     AccountRepository() {
-        Account account = new Account("hsoh","pass", "hsoh@mail.com");
-        account.setId(1);
-        accounts.add(account);
-        accountId = 2;
+        accountId = 1;
     }
 
     public Account save(Account accountDto) {
