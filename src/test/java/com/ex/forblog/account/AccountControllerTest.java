@@ -29,14 +29,11 @@ public class AccountControllerTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    @Autowired
-    private AccountRepository accountRepository;
-
     private MockMvc mockMvc;
 
     private Account registerAccountDto;
 
-    ObjectMapper mapper = new ObjectMapper();
+    private ObjectMapper mapper = new ObjectMapper();
 
     @Before
     public void setup() {
@@ -48,15 +45,14 @@ public class AccountControllerTest {
         registerAccountDto = new Account("hsoh", "password", "hsoh@gmail.com");
     }
 
-
+    /**
+     * 계정을 등록한다
+     * id:1, name:hsoh, password:password, email:hsoh@gmail.com
+     * 성공적으로 등록되면 201 상태코드를 반환한다.
+     * 성공적으로 등록되면 등록한 계정정보가 반환된다.
+     */
     @Test
     public void registAccount() throws Exception {
-        /**
-         * 계정을 등록한다
-         * id:1, name:hsoh, password:password, email:hsoh@gmail.com
-         * 성공적으로 등록되면 201 상태코드를 반환한다.
-         * 성공적으로 등록되면 등록한 계정정보가 반환된다.
-         */
         // Given
 
         // When
@@ -69,28 +65,48 @@ public class AccountControllerTest {
         resultActions.andDo(print())
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("name").value("hsoh"))
-                .andExpect(jsonPath("password").value("password"))
                 .andExpect(jsonPath("email").value("hsoh@gmail.com"));
     }
 
+    /**
+     * name, password, email 필드중 하나라도 없으면 등록하면 실패한다.
+     * 404 상태코드를 반환한다.
+     */
     @Test
-    public void getAllAccount() throws Exception {
-        /**
-         * 계정 리스트를 조회한다.
-         * 성공적으로 조회하면 200 상태코드를 반환한다.
-         */
-        // Given
-        accountRepository.save(this.registerAccountDto);
-        accountRepository.save(new Account("wellstone", "password", "wellstone@gmail.com"));
+    public void registAccountBadRequest() throws Exception {
+        //Given
+        this.registerAccountDto.setName(" ");
+        this.registerAccountDto.setPassword("1234");
 
-        // When
-        final ResultActions resultActions = mockMvc.perform(get("/accounts"));
+        //When
+        final ResultActions resultActions = mockMvc.perform(
+                post("/accounts").contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(this.registerAccountDto))
+                        .with(csrf()));
 
-        // Then
+        //Then
         resultActions.andDo(print())
-                .andExpect(status().isOk());
-
+                .andExpect(status().isBadRequest());
     }
+
+//    @Test
+//    public void getAllAccount() throws Exception {
+//        /**
+//         * 계정 리스트를 조회한다.
+//         * 성공적으로 조회하면 200 상태코드를 반환한다.
+//         */
+//        // Given
+//        accountRepository.save(this.registerAccountDto);
+//        accountRepository.save(new Account("wellstone", "password", "wellstone@gmail.com"));
+//
+//        // When
+//        final ResultActions resultActions = mockMvc.perform(get("/accounts"));
+//
+//        // Then
+//        resultActions.andDo(print())
+//                .andExpect(status().isOk());
+//
+//    }
 
 
 }
