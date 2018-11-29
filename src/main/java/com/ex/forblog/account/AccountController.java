@@ -41,7 +41,7 @@ public class AccountController {
     @GetMapping
     public ResponseEntity getAllAccount(){
         AccountResponse accountResponse = AccountResponse.builder().id(2).name("hsoh").email("h@g.com").build();
-        List<AccountResponse> accounts = Arrays.asList(accountResponse);
-        return new ResponseEntity<>(accounts, HttpStatus.OK);
+//        List<AccountResponse> accounts = Arrays.asList(accountResponse);
+//        return new ResponseEntity<>(accounts, HttpStatus.OK);
     }
 }
