@@ -28,9 +28,8 @@ public class AccountRepository {
     }
 
     public Account findById(int id) {
-        Integer idInteger = id;
         Account account = accounts.stream()
-                .filter(act -> idInteger.equals(act.getId()))
+                .filter(act -> Integer.valueOf(id).equals(act.getId()))
                 .findAny()
                 .orElse(null);
         return account;

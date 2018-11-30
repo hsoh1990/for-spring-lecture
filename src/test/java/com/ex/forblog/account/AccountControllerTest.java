@@ -129,5 +129,70 @@ public class AccountControllerTest {
                 .andExpect(jsonPath("$.email").value("hsoh@gmail.com"));
     }
 
+    /**
+     * 특정 id로 계정을 조회한다.
+     * 검색하는 id가 없으면 400 상태코드를 반환한다.
+     */
+    @Test
+    public void getAccountByIdNotFound() throws Exception {
+        //Given
 
+        //When
+
+        //Then
+    }
+
+    /**
+     * 특정 id의 계정의 정보를 수정한다.
+     * 성공적으로 수정되면 200 상태 코드를 반환한다.
+     * 성공적으로 수정되면 수정된 계정정보가 반환된다.
+     */
+    @Test
+    public void updateAccount() throws Exception {
+        //Given
+
+        //When
+
+        //Then
+    }
+
+    /**
+     * 특정 id의 계정의 정보를 수정한다.
+     * 검색하는 id가 없으면 400 상태코드를 반환한다.
+     */
+    @Test
+    public void updateAccountByIdNotFound() throws Exception {
+        //Given
+
+        //When
+
+        //Then
+    }
+
+    /**
+     * 특정 id의 계정의 정보를 삭제한다.
+     * 성공적으로 삭제되면 200 상태 코드를 반환한다.
+     * 성공적으로 삭제되면 삭제된 계정정보가 반환된다.
+     */
+    @Test
+    public void deleteAccount() throws Exception {
+        //Given
+
+        //When
+
+        //Then
+    }
+
+    /**
+     * 특정 id의 계정의 정보를 삭제한다.
+     * 검색하는 id가 없으면 400 상태코드를 반환한다.
+     */
+    @Test
+    public void deleteAccountByIdNotFound() throws Exception {
+        //Given
+
+        //When
+
+        //Then
+    }
 }
