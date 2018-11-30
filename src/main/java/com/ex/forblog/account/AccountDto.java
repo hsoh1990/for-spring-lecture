@@ -10,7 +10,7 @@ public class AccountDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class AccountRegister {
+    public static class AccountRegistDto {
         @NotBlank
         private String name;
         @NotBlank
@@ -23,7 +23,16 @@ public class AccountDto {
     @Builder
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class AccountResponse {
+    public static class AccountUpdateDto {
+        @NotBlank
+        private String email;
+    }
+
+    @Data
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class AccountResponseDto {
         private int id;
         private String name;
         private String email;

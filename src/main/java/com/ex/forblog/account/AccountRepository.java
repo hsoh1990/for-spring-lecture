@@ -2,6 +2,7 @@ package com.ex.forblog.account;
 
 import org.springframework.stereotype.Repository;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,9 +18,14 @@ public class AccountRepository {
     }
 
     public Account save(Account account) {
-        account.setId(accountId);
-        accounts.add(account);
-        accountId += 1;
+        if (account.getId() == 0){
+            account.setId(accounts.size()+1);
+            accounts.add(account);
+            accountId += 1;
+        } else {
+            accounts.set(account.getId()-1, account);
+        }
+
         return account;
     }
 
@@ -33,5 +39,9 @@ public class AccountRepository {
                 .findAny()
                 .orElse(null);
         return account;
+    }
+
+    public void delete(Account account) {
+        accounts.remove(account.getId()-1);
     }
 }

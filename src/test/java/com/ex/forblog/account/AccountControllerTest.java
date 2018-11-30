@@ -15,8 +15,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -33,7 +32,7 @@ public class AccountControllerTest {
 
     private MockMvc mockMvc;
 
-    private AccountDto.AccountRegister registerAccountDto;
+    private AccountDto.AccountRegistDto registerAccountDto;
 
     private ObjectMapper mapper = new ObjectMapper();
 
@@ -45,7 +44,7 @@ public class AccountControllerTest {
                 .alwaysDo(print())
                 .build();
 
-        registerAccountDto = AccountDto.AccountRegister.builder()
+        registerAccountDto = AccountDto.AccountRegistDto.builder()
                 .name("hsoh")
                 .password("password")
                 .email("hsoh@gmail.com")
@@ -104,7 +103,8 @@ public class AccountControllerTest {
         accountService.register(this.registerAccountDto);
 
         // When
-        final ResultActions resultActions = mockMvc.perform(get("/accounts"));
+        final ResultActions resultActions = mockMvc.perform(
+                get("/accounts"));
 
         // Then
         resultActions.andExpect(status().isOk());
@@ -121,7 +121,8 @@ public class AccountControllerTest {
         final Account account = accountService.register(this.registerAccountDto);
 
         // When
-        final ResultActions resultActions = mockMvc.perform(get("/accounts/" + account.getId()));
+        final ResultActions resultActions = mockMvc.perform(
+                get("/accounts/" + account.getId()));
 
         // Then
         resultActions.andExpect(status().isOk())
@@ -137,9 +138,14 @@ public class AccountControllerTest {
     public void getAccountByIdNotFound() throws Exception {
         //Given
 
-        //When
+        // When
+        final ResultActions resultActions = mockMvc.perform(
+                get("/accounts/100"));
 
-        //Then
+        // Then
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message")
+                        .value("id가 100인 계정이 없습니다."));
     }
 
     /**
@@ -150,10 +156,20 @@ public class AccountControllerTest {
     @Test
     public void updateAccount() throws Exception {
         //Given
+        final Account account = accountService.register(this.registerAccountDto);
+        this.registerAccountDto.setEmail("wellstone@gmail.com");
 
         //When
+        final ResultActions resultActions = mockMvc.perform(
+                put("/accounts/" + account.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(this.registerAccountDto))
+                        .with(csrf()));
 
         //Then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("hsoh"))
+                .andExpect(jsonPath("$.email").value("wellstone@gmail.com"));
     }
 
     /**
@@ -163,10 +179,19 @@ public class AccountControllerTest {
     @Test
     public void updateAccountByIdNotFound() throws Exception {
         //Given
+        final Account account = accountService.register(this.registerAccountDto);
 
-        //When
+        // When
+        final ResultActions resultActions = mockMvc.perform(
+                put("/accounts/100")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(this.registerAccountDto))
+                        .with(csrf()));
 
-        //Then
+        // Then
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message")
+                        .value("id가 100인 계정이 없습니다."));
     }
 
     /**
@@ -177,10 +202,14 @@ public class AccountControllerTest {
     @Test
     public void deleteAccount() throws Exception {
         //Given
+        final Account account = accountService.register(this.registerAccountDto);
 
-        //When
+        // When
+        final ResultActions resultActions = mockMvc.perform(
+                delete("/accounts/" + account.getId()));
 
-        //Then
+        // Then
+        resultActions.andExpect(status().isOk());
     }
 
     /**
