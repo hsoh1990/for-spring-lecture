@@ -1,6 +1,7 @@
 package com.ex.forblog.account;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 class Account {
