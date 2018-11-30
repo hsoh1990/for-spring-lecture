@@ -11,9 +11,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -28,9 +27,9 @@ public class AccountController {
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity registAccount(@RequestBody @Valid final AccountRegister accountDto,
-                                                         final BindingResult result){
-        if(result.hasErrors()){
-            return new ResponseEntity<>( result.getFieldErrors(), HttpStatus.BAD_REQUEST);
+                                        final BindingResult result) {
+        if (result.hasErrors()) {
+            return new ResponseEntity<>(result.getFieldErrors(), HttpStatus.BAD_REQUEST);
         }
 
         Account account = accountService.register(accountDto);
@@ -39,9 +38,18 @@ public class AccountController {
     }
 
     @GetMapping
-    public ResponseEntity getAllAccount(){
-        AccountResponse accountResponse = AccountResponse.builder().id(2).name("hsoh").email("h@g.com").build();
-        List<AccountResponse> accounts = Arrays.asList(accountResponse);
-        return new ResponseEntity<>(accounts, HttpStatus.OK);
+    public ResponseEntity getAllAccounts() {
+        List<Account> accounts = accountService.getAllAccounts();
+        List<AccountResponse> accountResponses = accounts.stream()
+                .map(account -> modelMapper.map(account, AccountResponse.class))
+                .collect(Collectors.toList());
+        return new ResponseEntity<>(accountResponses, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity getAccount(@PathVariable int id) {
+        Account account = accountService.getAccount(id);
+        AccountResponse accountResponse = modelMapper.map(account, AccountResponse.class);
+        return new ResponseEntity<>(accountResponse, HttpStatus.OK);
     }
 }

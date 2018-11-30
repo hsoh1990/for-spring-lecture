@@ -42,6 +42,7 @@ public class AccountControllerTest {
         this.mockMvc = MockMvcBuilders
                 .webAppContextSetup(webApplicationContext)
                 .apply(springSecurity())
+                .alwaysDo(print())
                 .build();
 
         registerAccountDto = AccountDto.AccountRegister.builder()
@@ -68,10 +69,9 @@ public class AccountControllerTest {
                         .with(csrf()));
 
         // Then
-        resultActions.andDo(print())
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("name").value("hsoh"))
-                .andExpect(jsonPath("email").value("hsoh@gmail.com"));
+        resultActions.andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("hsoh"))
+                .andExpect(jsonPath("$.email").value("hsoh@gmail.com"));
     }
 
     /**
@@ -91,8 +91,7 @@ public class AccountControllerTest {
                         .with(csrf()));
 
         //Then
-        resultActions.andDo(print())
-                .andExpect(status().isBadRequest());
+        resultActions.andExpect(status().isBadRequest());
     }
 
     /**
@@ -100,7 +99,7 @@ public class AccountControllerTest {
      * 성공적으로 조회하면 200 상태코드를 반환한다.
      */
     @Test
-    public void getAllAccount() throws Exception {
+    public void getAllAccounts() throws Exception {
         // Given
         accountService.register(this.registerAccountDto);
 
@@ -108,8 +107,26 @@ public class AccountControllerTest {
         final ResultActions resultActions = mockMvc.perform(get("/accounts"));
 
         // Then
-        resultActions.andDo(print())
-                .andExpect(status().isOk());
+        resultActions.andExpect(status().isOk());
+    }
+
+    /**
+     * 특정 id로 계정을 조회한다.
+     * 성공적으로 조회하면 200 상태코드를 반환한다.
+     * 성공적으로 조회되면 계정정보가 반환된다.
+     */
+    @Test
+    public void getAccount() throws Exception {
+        // Given
+        final Account account = accountService.register(this.registerAccountDto);
+
+        // When
+        final ResultActions resultActions = mockMvc.perform(get("/accounts/" + account.getId()));
+
+        // Then
+        resultActions.andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("hsoh"))
+                .andExpect(jsonPath("$.email").value("hsoh@gmail.com"));
     }
 
 

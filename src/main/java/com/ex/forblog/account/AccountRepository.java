@@ -23,8 +23,16 @@ public class AccountRepository {
         return account;
     }
 
-//    public List<Account> findAll(){
-//        return accounts;
-//    }
+    public List<Account> findAll() {
+        return accounts;
+    }
 
+    public Account findById(int id) {
+        Integer idInteger = id;
+        Account account = accounts.stream()
+                .filter(act -> idInteger.equals(act.getId()))
+                .findAny()
+                .orElse(null);
+        return account;
+    }
 }
