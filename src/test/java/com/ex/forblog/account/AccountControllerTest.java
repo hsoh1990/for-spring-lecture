@@ -201,7 +201,7 @@ public class AccountControllerTest {
      */
     @Test
     public void deleteAccount() throws Exception {
-        //Given 
+        //Given
         final Account account = accountService.register(this.registerAccountDto);
 
         // When
