@@ -25,12 +25,14 @@ repositories {
 
 
 dependencies {
-//	compile('org.springframework.boot:spring-boot-starter-data-jpa')
-	compile('org.springframework.boot:spring-boot-starter-security')
-	compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('org.springframework.boot:spring-boot-starter-security')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
     compile('org.modelmapper:modelmapper:0.7.5')
 
-	compileOnly('org.projectlombok:lombok')
+    compileOnly('org.projectlombok:lombok')
+
+    runtime("com.h2database:h2")
 
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 	testCompile('org.springframework.security:spring-security-test')

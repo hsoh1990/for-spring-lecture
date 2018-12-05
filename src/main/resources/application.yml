@@ -1,2 +1,15 @@
 server:
   port: 9090
+spring:
+  datasource:
+    platform: h2
+    username: sa
+    password:
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: create
+    generate-ddl: true
+  h2:
+    console:
+      enabled: true

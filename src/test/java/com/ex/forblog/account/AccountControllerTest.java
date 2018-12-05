@@ -220,8 +220,17 @@ public class AccountControllerTest {
     public void deleteAccountByIdNotFound() throws Exception {
         //Given
 
-        //When
 
-        //Then
+        // When
+        final ResultActions resultActions = mockMvc.perform(
+                delete("/accounts/100")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(this.registerAccountDto))
+                        .with(csrf()));
+
+        // Then
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message")
+                        .value("id가 100인 계정이 없습니다."));
     }
 }
