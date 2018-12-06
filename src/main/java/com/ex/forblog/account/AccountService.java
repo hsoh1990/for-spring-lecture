@@ -26,7 +26,7 @@ public class AccountService {
     }
 
     public Account getAccount(int id) {
-        Account account = accountRepository.findById(id);
+        Account account = accountRepository.findOne(id);
         if (account ==null){
             throw new NotFoundException(String.valueOf(id));
         }
@@ -34,7 +34,7 @@ public class AccountService {
     }
 
     public Account updateAccount(int id, AccountDto.AccountUpdateDto accountUpdateDto) {
-        Account account = accountRepository.findById(id);
+        Account account = accountRepository.findOne(id);
         if (account ==null){
             throw new NotFoundException(String.valueOf(id));
         }
@@ -46,7 +46,7 @@ public class AccountService {
     }
 
     public Account deleteAccount(int id) {
-        Account account = accountRepository.findById(id);
+        Account account = accountRepository.findOne(id);
         if (account ==null){
             throw new NotFoundException(String.valueOf(id));
         }

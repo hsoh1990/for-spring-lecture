@@ -13,6 +13,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import javax.transaction.Transactional;
+
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -22,6 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@Transactional
 public class AccountControllerTest {
 
     @Autowired
@@ -220,8 +223,17 @@ public class AccountControllerTest {
     public void deleteAccountByIdNotFound() throws Exception {
         //Given
 
-        //When
 
-        //Then
+        // When
+        final ResultActions resultActions = mockMvc.perform(
+                delete("/accounts/100")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(this.registerAccountDto))
+                        .with(csrf()));
+
+        // Then
+        resultActions.andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message")
+                        .value("id가 100인 계정이 없습니다."));
     }
 }
