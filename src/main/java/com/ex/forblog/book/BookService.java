@@ -1,19 +1,16 @@
 package com.ex.forblog.book;
 
-//@Service
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service
 public class BookService {
 
+    @Autowired
     public BookRepository bookRepository;
 
     public void setBookRepository(BookRepository bookRepository){
         this.bookRepository = bookRepository;
     }
-
-
-//    @PostConstruct
-//    public void postBookService(){
-//        System.out.println("==============");
-//        System.out.println("book service");
-//    }
 
 }
