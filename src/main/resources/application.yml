@@ -1,13 +1,2 @@
 server:
   port: 9090
-spring:
-  datasource:
-    platform: postgres
-    url: jdbc:postgresql://localhost:5432/spring_start
-    username: hsoh
-    password: dblab321
-  jpa:
-    show-sql: true
-    hibernate:
-      ddl-auto: create
-    generate-ddl: true
