@@ -1,4 +1,4 @@
-package com.ex.forblog.book;
+package com.ex.forblog;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
