@@ -18,7 +18,11 @@ public class AppRunner implements ApplicationRunner{
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        System.out.println(resourceLoader.getClass());
+
         Resource resource = resourceLoader.getResource("classpath:text.txt");
+        System.out.println(resource.getClass());
+
         System.out.println(resource.exists());
         System.out.println(resource.getDescription());
         Files.lines(Paths.get(resource.getURI())).forEach(System.out::println);
