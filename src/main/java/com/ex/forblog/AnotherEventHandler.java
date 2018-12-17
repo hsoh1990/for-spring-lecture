@@ -6,12 +6,12 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AppEventHandler {
+public class AnotherEventHandler {
 
     @EventListener
-    @Order(Ordered.HIGHEST_PRECEDENCE)
+    @Order(Ordered.HIGHEST_PRECEDENCE + 2)
     public void handle(AppEvent event){
         System.out.println(Thread.currentThread().toString());
-        System.out.println("AppEventHandler = " +event.getData());
+        System.out.println("AnotherEventHandler = " +event.getData());
     }
 }
