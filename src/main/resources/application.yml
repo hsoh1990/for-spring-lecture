@@ -1,6 +1,0 @@
-server:
-  port: 9090
-app:
-  about: spring
-my:
-  value: 100

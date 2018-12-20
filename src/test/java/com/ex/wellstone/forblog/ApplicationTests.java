@@ -1,4 +1,4 @@
-package com.ex.forblog;
+package com.ex.wellstone.forblog;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,3 +14,4 @@ public class ApplicationTests {
 	}
 
 }
+
