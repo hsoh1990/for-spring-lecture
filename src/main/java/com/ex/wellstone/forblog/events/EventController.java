@@ -47,12 +47,11 @@ public class EventController {
         event.update();
         Event newEvent = eventRepository.save(event);
 
-        final ControllerLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
+        ControllerLinkBuilder selfLinkBuilder = linkTo(EventController.class).slash(newEvent.getId());
         URI createUri = selfLinkBuilder.toUri();
         EventResource eventResource = new EventResource(event);
         eventResource.add(linkTo(EventController.class).withRel("query-events"));
-        eventResource.add(selfLinkBuilder.withSelfRel());
-        eventResource.add(selfLinkBuilder.withRel("update-events"));
+        eventResource.add(selfLinkBuilder.withRel("update-event"));
 
         return ResponseEntity.created(createUri).body(eventResource);
     }

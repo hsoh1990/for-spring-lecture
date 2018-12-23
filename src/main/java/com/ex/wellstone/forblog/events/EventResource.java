@@ -1,18 +1,15 @@
 package com.ex.wellstone.forblog.events;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import org.springframework.hateoas.ResourceSupport;
+import org.springframework.hateoas.Link;
+import org.springframework.hateoas.Resource;
 
-public class EventResource extends ResourceSupport {
+import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
-    @JsonUnwrapped
-    private Event event;
+public class EventResource extends Resource<Event> {
 
-    public EventResource(Event event) {
-        this.event = event;
+    public EventResource(Event content, Link... links) {
+        super(content, links);
+        add(linkTo(EventController.class).slash(content.getId()).withSelfRel());
     }
 
-    public Event getEvent() {
-        return event;
-    }
 }
