@@ -1,0 +1,18 @@
+package com.ex.wellstone.forblog.events;
+
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import org.springframework.hateoas.ResourceSupport;
+
+public class EventResource extends ResourceSupport {
+
+    @JsonUnwrapped
+    private Event event;
+
+    public EventResource(Event event) {
+        this.event = event;
+    }
+
+    public Event getEvent() {
+        return event;
+    }
+}
