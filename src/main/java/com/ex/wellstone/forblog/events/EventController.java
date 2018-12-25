@@ -1,5 +1,6 @@
 package com.ex.wellstone.forblog.events;
 
+import com.ex.wellstone.forblog.common.ErrorsResource;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.bind.BindResult;
@@ -35,12 +36,12 @@ public class EventController {
     public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors){
 
         if(errors.hasErrors()){
-            return ResponseEntity.badRequest().body(errors);
+            return badRequest(errors);
         }
 
         eventValidator.validate(eventDto, errors);
         if(errors.hasErrors()){
-            return ResponseEntity.badRequest().body(errors);
+            return badRequest(errors);
         }
 
 
@@ -57,5 +58,9 @@ public class EventController {
         eventResource.add(new Link("/docs/index.html#resources-events-create").withRel("profile"));
 
         return ResponseEntity.created(createUri).body(eventResource);
+    }
+
+    private ResponseEntity badRequest(Errors errors) {
+        return ResponseEntity.badRequest().body(new ErrorsResource(errors));
     }
 }
