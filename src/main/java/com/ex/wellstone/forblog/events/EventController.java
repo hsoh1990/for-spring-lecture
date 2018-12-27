@@ -14,13 +14,11 @@ import org.springframework.hateoas.mvc.ControllerLinkBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Optional;
 
 import static org.springframework.hateoas.mvc.ControllerLinkBuilder.linkTo;
 
@@ -38,14 +36,14 @@ public class EventController {
     EventValidator eventValidator;
 
     @PostMapping()
-    public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors){
+    public ResponseEntity createEvent(@RequestBody @Valid EventDto eventDto, Errors errors) {
 
-        if(errors.hasErrors()){
+        if (errors.hasErrors()) {
             return badRequest(errors);
         }
 
         eventValidator.validate(eventDto, errors);
-        if(errors.hasErrors()){
+        if (errors.hasErrors()) {
             return badRequest(errors);
         }
 
@@ -66,7 +64,7 @@ public class EventController {
     }
 
     @GetMapping
-    public ResponseEntity queryEvents(Pageable pageable, PagedResourcesAssembler<Event> assembler){
+    public ResponseEntity getEvents(Pageable pageable, PagedResourcesAssembler<Event> assembler) {
         final Page<Event> page = this.eventRepository.findAll(pageable);
         final PagedResources<Resource<Event>> pagedResources = assembler.toResource(page, e -> new EventResource(e));
 
@@ -74,6 +72,23 @@ public class EventController {
 
         return ResponseEntity.ok(pagedResources);
     }
+
+    @GetMapping(value = "/{id}")
+    public ResponseEntity getEvent(@PathVariable Integer id) {
+        final Optional<Event> optionalEvent= this.eventRepository.findById(id);
+        if (optionalEvent.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Event event = optionalEvent.get();
+        final EventResource eventResource = new EventResource(event);
+        eventResource.add(linkTo(EventController.class).withRel("query-events"));
+        eventResource.add(linkTo(EventController.class).slash(event.getId()).withRel("update-event"));
+        eventResource.add(new Link("/docs/index.html#resources-events-get").withRel("profile"));
+
+        return ResponseEntity.ok().body(eventResource);
+    }
+
     private ResponseEntity badRequest(Errors errors) {
         return ResponseEntity.badRequest().body(new ErrorsResource(errors));
     }
