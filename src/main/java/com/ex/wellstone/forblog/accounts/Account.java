@@ -1,7 +1,6 @@
 package com.ex.wellstone.forblog.accounts;
 
 import lombok.*;
-import net.bytebuddy.build.HashCodeAndEqualsPlugin;
 
 import javax.persistence.*;
 import java.util.Set;
