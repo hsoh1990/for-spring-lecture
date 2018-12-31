@@ -3,6 +3,7 @@ package com.ex.wellstone.forblog.configs;
 import com.ex.wellstone.forblog.accounts.Account;
 import com.ex.wellstone.forblog.accounts.AccountRole;
 import com.ex.wellstone.forblog.accounts.AccountService;
+import com.ex.wellstone.forblog.common.AppProperties;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -33,14 +34,24 @@ public class AppConfig {
             @Autowired
             AccountService accountService;
 
+            @Autowired
+            AppProperties appProperties;
+
             @Override
             public void run(ApplicationArguments args) throws Exception {
-                final Account hsoh = Account.builder()
-                        .email("admin@email.com")
-                        .password("admin")
+                final Account admin = Account.builder()
+                        .email(appProperties.getAdminUserName())
+                        .password(appProperties.getAdminPassword())
                         .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
                         .build();
-                accountService.saveAccount(hsoh);
+                accountService.saveAccount(admin);
+
+                final Account user = Account.builder()
+                        .email(appProperties.getUserUserName())
+                        .password(appProperties.getUserPassword() )
+                        .roles(Set.of(AccountRole.USER))
+                        .build();
+                accountService.saveAccount(user);
             }
         };
 

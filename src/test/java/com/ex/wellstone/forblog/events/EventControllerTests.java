@@ -4,6 +4,7 @@ import com.ex.wellstone.forblog.accounts.Account;
 import com.ex.wellstone.forblog.accounts.AccountRepository;
 import com.ex.wellstone.forblog.accounts.AccountRole;
 import com.ex.wellstone.forblog.accounts.AccountService;
+import com.ex.wellstone.forblog.common.AppProperties;
 import com.ex.wellstone.forblog.common.BaseControllerTest;
 import com.ex.wellstone.forblog.common.TestDescription;
 import org.junit.Before;
@@ -31,7 +32,6 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@Transactional
 public class EventControllerTests extends BaseControllerTest {
 
     @Autowired
@@ -42,6 +42,9 @@ public class EventControllerTests extends BaseControllerTest {
 
     @Autowired
     AccountRepository accountRepository;
+
+    @Autowired
+    AppProperties appProperties;
 
     @Before
     public void setUp(){
@@ -131,7 +134,6 @@ public class EventControllerTests extends BaseControllerTest {
                         )
                 ));
     }
-
 
     @Test
     @TestDescription("입력 받을 수 없는 값을 사용한 경우에 에러가 발생하는 테스트")
@@ -341,7 +343,6 @@ public class EventControllerTests extends BaseControllerTest {
                 ));
     }
 
-
     @Test
     @TestDescription("없는 이벤트 조회할 때 404응답")
     public void getEvent_404() throws Exception {
@@ -490,24 +491,22 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     private String getAccessToken() throws Exception {
-        final String username = "admin@email.com";
-        final String password = "admin";
+//        final String username = "admin@email.com";
+//        final String password = "admin";
         Account account = Account.builder()
-                .email(username)
-                .password(password)
+                .email(appProperties.getUserUserName())
+                .password(appProperties.getUserPassword() )
                 .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
                 .build();
 
         this.accountService.saveAccount(account);
 
-        String clientId = "myApp";
-        String clientSecret = "pass";
 
         final ResultActions perform = this.mockMvc
                 .perform(post("/oauth/token")
-                        .with(httpBasic(clientId, clientSecret))
-                        .param("username", username)
-                        .param("password", password)
+                        .with(httpBasic(appProperties.getClientId(), appProperties.getClientSecret()))
+                        .param("username", appProperties.getUserUserName())
+                        .param("password", appProperties.getUserPassword())
                         .param("grant_type", "password"));
 
         final String contentAsString = perform.andReturn().getResponse().getContentAsString();
