@@ -46,10 +46,27 @@ public class EventControllerTests extends BaseControllerTest {
     @Autowired
     AppProperties appProperties;
 
+    Account account;
+    Account admin;
+
     @Before
     public void setUp(){
-        eventRepository.deleteAll();
-        accountRepository.deleteAll();
+        this.eventRepository.deleteAll();
+        this.accountRepository.deleteAll();
+        this.account = Account.builder()
+                .email(appProperties.getUserUserName())
+                .password(appProperties.getUserPassword() )
+                .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
+                .build();
+
+        this.admin = Account.builder()
+                .email(appProperties.getAdminUserName())
+                .password(appProperties.getAdminPassword() )
+                .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
+                .build();
+
+        this.accountService.saveAccount(this.account);
+        this.accountService.saveAccount(this.admin);
     }
 
     @Test
@@ -286,6 +303,30 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     @Test
+    @TestDescription("인증 정보를 포함하여 30개의 이벤트를 10개씩 두번째 페이지 조회하기")
+    public void queryEventsWithAuthentication() throws Exception {
+        //Given
+        IntStream.range(0, 10).forEach(this::generateEvent);
+
+        //When
+        this.mockMvc
+                .perform(get("/api/events")
+                        .header(HttpHeaders.AUTHORIZATION, getBearerToken())
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaTypes.HAL_JSON)
+                        .param("page", "1")
+                        .param("size", "3")
+                        .param("sort", "name,DESC"))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("page").exists())
+                .andExpect(jsonPath("_embedded.eventList[0]._links.self").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.create-event").exists())
+                .andExpect(jsonPath("_links.profile").exists());
+    }
+
+    @Test
     @TestDescription("기존의 이벤트를 하나 조회하기")
     public void getEvent() throws Exception {
         //Given
@@ -306,7 +347,6 @@ public class EventControllerTests extends BaseControllerTest {
                         links(
                                 linkWithRel("self").description("link to self"),
                                 linkWithRel("query-events").description("link to query events"),
-                                linkWithRel("update-event").description("link to update an existing"),
                                 linkWithRel("profile").description("link to profile")
                         ),
                         requestHeaders(
@@ -337,10 +377,29 @@ public class EventControllerTests extends BaseControllerTest {
                                 fieldWithPath("manager").description("event manager"),
                                 fieldWithPath("_links.self.href").description("link to self"),
                                 fieldWithPath("_links.query-events.href").description("link to query event list"),
-                                fieldWithPath("_links.update-event.href").description("link to update existing event"),
                                 fieldWithPath("_links.profile.href").description("link to profile")
                         )
                 ));
+    }
+
+    @Test
+    @TestDescription("인증 정보를 포함하여 기존의 이벤트를 하나 조회하기")
+    public void getEventWithAuthentication() throws Exception {
+        //Given
+        Event event = this.generateEvent(100);
+
+        //When & Then
+        this.mockMvc
+                .perform(get("/api/events/{id}", event.getId())
+                        .header(HttpHeaders.AUTHORIZATION, getBearerToken())
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaTypes.HAL_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("name").exists())
+                .andExpect(jsonPath("id").exists())
+                .andExpect(jsonPath("_links.self").exists())
+                .andExpect(jsonPath("_links.profile").exists());
     }
 
     @Test
@@ -486,22 +545,32 @@ public class EventControllerTests extends BaseControllerTest {
                 .andExpect(status().isNotFound() );
     }
 
+    @Test
+    @TestDescription("존재하지 않는 이벤트 수정 실패")
+    public void updateEvent_Unauthorized_different_account() throws Exception {
+        //Given
+        Event event = this.generateAdminEvent(200);
+        EventDto eventDto = modelMapper.map(event, EventDto.class);
+
+        final String eventName = "Updated event";
+        eventDto.setName(eventName);
+
+        //When & Then
+        this.mockMvc
+                .perform(put("/api/events/{id}", event.getId())
+                        .header(HttpHeaders.AUTHORIZATION, this.getBearerToken())
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .accept(MediaTypes.HAL_JSON)
+                        .content(objectMapper.writeValueAsString(eventDto)))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+
     private String getBearerToken() throws Exception {
          return "Bearer " + getAccessToken();
     }
 
     private String getAccessToken() throws Exception {
-//        final String username = "admin@email.com";
-//        final String password = "admin";
-        Account account = Account.builder()
-                .email(appProperties.getUserUserName())
-                .password(appProperties.getUserPassword() )
-                .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
-                .build();
-
-        this.accountService.saveAccount(account);
-
-
         final ResultActions perform = this.mockMvc
                 .perform(post("/oauth/token")
                         .with(httpBasic(appProperties.getClientId(), appProperties.getClientSecret()))
@@ -528,7 +597,29 @@ public class EventControllerTests extends BaseControllerTest {
                 .location("강남역 D2 스타텁 팩토리")
                 .free(false)
                 .offline(true)
-                .eventStatus(EventStatus.DRAFT )
+                .eventStatus(EventStatus.DRAFT)
+                .manager(this.account)
+                .build();
+
+        return this.eventRepository.save(event);
+    }
+
+    private Event generateAdminEvent(int index) {
+        Event event = Event.builder()
+                .name("event " + index)
+                .description("REST API Development with Spring")
+                .beginEnrollmentDateTime(LocalDateTime.of(2018, 12, 20, 14, 20))
+                .closeEnrollmentDateTime(LocalDateTime.of(2018, 12, 21, 14, 20))
+                .beginEventDateTime(LocalDateTime.of(2018, 12, 22, 14, 20))
+                .endEventDateTime(LocalDateTime.of(2018, 12, 23, 14, 20))
+                .basePrice(100)
+                .maxPrice(200)
+                .limitOfEnrollment(100)
+                .location("강남역 D2 스타텁 팩토리")
+                .free(false)
+                .offline(true)
+                .eventStatus(EventStatus.DRAFT)
+                .manager(this.admin)
                 .build();
 
         return this.eventRepository.save(event);
