@@ -80,7 +80,7 @@ public class EventController {
         final PagedResources<Resource<Event>> pagedResources = assembler.toResource(page, e -> new EventResource(e));
 
         pagedResources.add(new Link("/docs/index.html#resources-events-list").withRel("profile"));
-        if(account != null){
+        if (account != null) {
             pagedResources.add(linkTo(EventController.class).withRel("create-event"));
         }
         return ResponseEntity.ok(pagedResources);
@@ -99,7 +99,7 @@ public class EventController {
         eventResource.add(new Link("/docs/index.html#resources-events-get").withRel("profile"));
         eventResource.add(linkTo(EventController.class).withRel("query-events"));
 
-        if (event.getManager().equals(currentUser)){
+        if (event.getManager().equals(currentUser)) {
             eventResource.add(linkTo(EventController.class).slash(event.getId()).withRel("update-event"));
         }
 
@@ -111,21 +111,21 @@ public class EventController {
                                       @RequestBody @Valid EventDto eventDto, Errors errors,
                                       @CurrentUser Account currentUser) {
         final Optional<Event> optionalEvent = this.eventRepository.findById(id);
-        if(optionalEvent.isEmpty()){
+        if (optionalEvent.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        if(errors.hasErrors()){
+        if (errors.hasErrors()) {
             return this.badRequest(errors);
         }
 
         this.eventValidator.validate(eventDto, errors);
-        if(errors.hasErrors()){
+        if (errors.hasErrors()) {
             return this.badRequest(errors);
         }
 
         Event existingEvent = optionalEvent.get();
-        if(!existingEvent.getManager().equals(currentUser)){
+        if (!existingEvent.getManager().equals(currentUser)) {
             return new ResponseEntity(HttpStatus.UNAUTHORIZED);
         }
 

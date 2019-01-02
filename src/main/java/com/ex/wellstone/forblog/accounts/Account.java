@@ -18,12 +18,12 @@ public class Account {
     @GeneratedValue
     private Integer id;
 
-    @Column(unique = true )
+    @Column(unique = true)
     private String email;
 
     private String password;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
-    private Set<AccountRole > roles;
+    private Set<AccountRole> roles;
 }

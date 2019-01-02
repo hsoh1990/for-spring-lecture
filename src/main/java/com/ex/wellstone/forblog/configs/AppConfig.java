@@ -48,7 +48,7 @@ public class AppConfig {
 
                 final Account user = Account.builder()
                         .email(appProperties.getUserUserName())
-                        .password(appProperties.getUserPassword() )
+                        .password(appProperties.getUserPassword())
                         .roles(Set.of(AccountRole.USER))
                         .build();
                 accountService.saveAccount(user);
