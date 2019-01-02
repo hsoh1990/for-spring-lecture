@@ -2,6 +2,8 @@ package com.ex.wellstone.forblog.events;
 
 
 import com.ex.wellstone.forblog.accounts.Account;
+import com.ex.wellstone.forblog.accounts.AccountSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 
 import javax.persistence.*;
@@ -34,6 +36,7 @@ public class Event {
     @Enumerated(EnumType.STRING)
     private EventStatus eventStatus = EventStatus.DRAFT;
     @ManyToOne
+    @JsonSerialize(using = AccountSerializer.class)
     private Account manager;
 
     public void update() {

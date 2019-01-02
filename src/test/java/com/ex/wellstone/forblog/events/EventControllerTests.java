@@ -46,22 +46,23 @@ public class EventControllerTests extends BaseControllerTest {
     @Autowired
     AppProperties appProperties;
 
-    Account account;
-    Account admin;
+    private Account account;
+
+    private Account admin;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         this.eventRepository.deleteAll();
         this.accountRepository.deleteAll();
         this.account = Account.builder()
                 .email(appProperties.getUserUserName())
-                .password(appProperties.getUserPassword() )
+                .password(appProperties.getUserPassword())
                 .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
                 .build();
 
         this.admin = Account.builder()
                 .email(appProperties.getAdminUserName())
-                .password(appProperties.getAdminPassword() )
+                .password(appProperties.getAdminPassword())
                 .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
                 .build();
 
@@ -143,7 +144,7 @@ public class EventControllerTests extends BaseControllerTest {
                                 fieldWithPath("free").description("it tells if this event is free or not"),
                                 fieldWithPath("offline").description("it tells if this event is offline event or not"),
                                 fieldWithPath("eventStatus").description("event status"),
-                                fieldWithPath("manager").description("event manager"),
+                                fieldWithPath("manager.id").description("event manager id"),
                                 fieldWithPath("_links.self.href").description("link to self"),
                                 fieldWithPath("_links.query-events.href").description("link to query event list"),
                                 fieldWithPath("_links.update-event.href").description("link to update existing event"),
@@ -286,7 +287,7 @@ public class EventControllerTests extends BaseControllerTest {
                                 fieldWithPath("_embedded.eventList[0].offline").description("이벤트 online/offline"),
                                 fieldWithPath("_embedded.eventList[0].free").description("이벤트 무료/유료"),
                                 fieldWithPath("_embedded.eventList[0].eventStatus").description("이벤트 상태"),
-                                fieldWithPath("_embedded.eventList[0].manager").description("event manager"),
+                                fieldWithPath("_embedded.eventList[0].manager.id").description("event manager id"),
                                 fieldWithPath("_embedded.eventList[0]._links.self.href").description("이벤트 링크"),
                                 fieldWithPath("_links.first.href").description("첫번째 이벤트 목록"),
                                 fieldWithPath("_links.prev.href").description("이전 이벤트 목록"),
@@ -374,7 +375,7 @@ public class EventControllerTests extends BaseControllerTest {
                                 fieldWithPath("free").description("it tells if this event is free or not"),
                                 fieldWithPath("offline").description("it tells if this event is offline event or not"),
                                 fieldWithPath("eventStatus").description("event status"),
-                                fieldWithPath("manager").description("event manager"),
+                                fieldWithPath("manager.id").description("event manager id"),
                                 fieldWithPath("_links.self.href").description("link to self"),
                                 fieldWithPath("_links.query-events.href").description("link to query event list"),
                                 fieldWithPath("_links.profile.href").description("link to profile")
@@ -481,7 +482,7 @@ public class EventControllerTests extends BaseControllerTest {
                                 fieldWithPath("free").description("it tells if this event is free or not"),
                                 fieldWithPath("offline").description("it tells if this event is offline event or not"),
                                 fieldWithPath("eventStatus").description("event status"),
-                                fieldWithPath("manager").description("event manager"),
+                                fieldWithPath("manager.id").description("event manager id"),
                                 fieldWithPath("_links.self.href").description("link to self"),
                                 fieldWithPath("_links.profile.href").description("link to profile")
                         )
@@ -504,7 +505,7 @@ public class EventControllerTests extends BaseControllerTest {
                         .accept(MediaTypes.HAL_JSON)
                         .content(objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
-                .andExpect(status().isBadRequest() );
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -524,7 +525,7 @@ public class EventControllerTests extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON_UTF8)
                         .content(objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
-                .andExpect(status().isBadRequest() );
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -532,7 +533,7 @@ public class EventControllerTests extends BaseControllerTest {
     public void updateEvent_404() throws Exception {
         //Given
         final Event event = this.generateEvent(11111);
-        EventDto eventDto = this.modelMapper.map( event, EventDto.class);
+        EventDto eventDto = this.modelMapper.map(event, EventDto.class);
 
         //When & Then
         this.mockMvc
@@ -542,7 +543,7 @@ public class EventControllerTests extends BaseControllerTest {
                         .accept(MediaTypes.HAL_JSON)
                         .content(objectMapper.writeValueAsString(eventDto)))
                 .andDo(print())
-                .andExpect(status().isNotFound() );
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -567,7 +568,7 @@ public class EventControllerTests extends BaseControllerTest {
     }
 
     private String getBearerToken() throws Exception {
-         return "Bearer " + getAccessToken();
+        return "Bearer " + getAccessToken();
     }
 
     private String getAccessToken() throws Exception {
@@ -579,7 +580,7 @@ public class EventControllerTests extends BaseControllerTest {
                         .param("grant_type", "password"));
 
         final String contentAsString = perform.andReturn().getResponse().getContentAsString();
-        Jackson2JsonParser parser   = new Jackson2JsonParser();
+        Jackson2JsonParser parser = new Jackson2JsonParser();
         return parser.parseMap(contentAsString).get("access_token").toString();
     }
 
