@@ -1,6 +1,9 @@
 package com.ex.wellstone.forblog.events;
 
 
+import com.ex.wellstone.forblog.accounts.Account;
+import com.ex.wellstone.forblog.accounts.AccountSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.*;
 
 import javax.persistence.*;
@@ -32,17 +35,20 @@ public class Event {
     private boolean free;
     @Enumerated(EnumType.STRING)
     private EventStatus eventStatus = EventStatus.DRAFT;
+    @ManyToOne
+    @JsonSerialize(using = AccountSerializer.class)
+    private Account manager;
 
     public void update() {
         //Update Free
-        if(this.basePrice == 0 && this.maxPrice ==0){
+        if (this.basePrice == 0 && this.maxPrice == 0) {
             this.free = true;
         } else {
             this.free = false;
         }
 
         //Update offline
-        if(this.location == null || this.location.isBlank()){
+        if (this.location == null || this.location.isBlank()) {
             this.offline = false;
         } else {
             this.offline = true;
