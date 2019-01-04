@@ -1,6 +1,7 @@
 package com.ex.wellstone.forblog.configs;
 
 import com.ex.wellstone.forblog.accounts.Account;
+import com.ex.wellstone.forblog.accounts.AccountRepository;
 import com.ex.wellstone.forblog.accounts.AccountRole;
 import com.ex.wellstone.forblog.accounts.AccountService;
 import com.ex.wellstone.forblog.common.AppProperties;
@@ -13,6 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.List;
 import java.util.Set;
 
 @Configuration
@@ -37,21 +39,28 @@ public class AppConfig {
             @Autowired
             AppProperties appProperties;
 
+            @Autowired
+            AccountRepository accountRepository;
+
             @Override
             public void run(ApplicationArguments args) throws Exception {
-                final Account admin = Account.builder()
-                        .email(appProperties.getAdminUserName())
-                        .password(appProperties.getAdminPassword())
-                        .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
-                        .build();
-                accountService.saveAccount(admin);
+                List<Account> accountRepositoryAll = accountRepository.findAll();
+                if (accountRepositoryAll.isEmpty()) {
+                    final Account admin = Account.builder()
+                            .email(appProperties.getAdminUserName())
+                            .password(appProperties.getAdminPassword())
+                            .roles(Set.of(AccountRole.ADMIN, AccountRole.USER))
+                            .build();
+                    accountService.saveAccount(admin);
 
-                final Account user = Account.builder()
-                        .email(appProperties.getUserUserName())
-                        .password(appProperties.getUserPassword())
-                        .roles(Set.of(AccountRole.USER))
-                        .build();
-                accountService.saveAccount(user);
+                    final Account user = Account.builder()
+                            .email(appProperties.getUserUserName())
+                            .password(appProperties.getUserPassword())
+                            .roles(Set.of(AccountRole.USER))
+                            .build();
+                    accountService.saveAccount(user);
+                }
+
             }
         };
 
