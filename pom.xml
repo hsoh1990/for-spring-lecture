@@ -9,9 +9,9 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.ex.wellstone</groupId>
-    <artifactId>for-spring-lecture</artifactId>
+    <artifactId>lecture-spring-whiteship</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>for-spring-lecture</name>
+    <name>lecture-spring-whiteship</name>
     <description>project for Spring Lecture</description>
 
     <properties>
